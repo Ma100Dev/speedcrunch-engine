@@ -21,6 +21,7 @@
 #define KEYPAD_H
 
 #include "core/settings.h"
+#include <QJsonObject>
 #include <QJsonParseError>
 #include <vector>
 

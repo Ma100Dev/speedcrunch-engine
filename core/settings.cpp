@@ -284,7 +284,7 @@ void Settings::save()
 char Settings::radixCharacter() const
 {
     if (isRadixCharacterAuto() || isRadixCharacterBoth())
-        return QLocale().decimalPoint().toLatin1();
+        return QLocale().decimalPoint().toLatin1()[0];
 
     return s_radixCharacter;
 }

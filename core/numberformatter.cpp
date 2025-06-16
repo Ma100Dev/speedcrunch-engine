@@ -27,11 +27,13 @@ static const QChar g_minusChar = QString::fromUtf8("−")[0];
 
 QString NumberFormatter::format(Quantity q)
 {
-    Settings* settings = Settings::instance();
+    Settings *settings = Settings::instance();
 
     Quantity::Format format = q.format();
-    if (format.base == Quantity::Format::Base::Null) {
-        switch (settings->resultFormat) {
+    if (format.base == Quantity::Format::Base::Null)
+    {
+        switch (settings->resultFormat)
+        {
         case 'b':
             format.base = Quantity::Format::Base::Binary;
             break;
@@ -52,34 +54,40 @@ QString NumberFormatter::format(Quantity q)
         }
     }
 
-    if (format.mode == Quantity::Format::Mode::Null) {
-        if (format.base == Quantity::Format::Base::Decimal) {
-          switch (settings->resultFormat) {
-          case 'n':
-              format.mode = Quantity::Format::Mode::Engineering;
-              break;
-          case 'f':
-              format.mode = Quantity::Format::Mode::Fixed;
-              break;
-          case 'e':
-              format.mode = Quantity::Format::Mode::Scientific;
-              break;
-          case 's':
-              format.mode = Quantity::Format::Mode::Sexagesimal;
-              break;
-          case 'g':
-          default:
-              format.mode = Quantity::Format::Mode::General;
-              break;
-          }
-        } else {
+    if (format.mode == Quantity::Format::Mode::Null)
+    {
+        if (format.base == Quantity::Format::Base::Decimal)
+        {
+            switch (settings->resultFormat)
+            {
+            case 'n':
+                format.mode = Quantity::Format::Mode::Engineering;
+                break;
+            case 'f':
+                format.mode = Quantity::Format::Mode::Fixed;
+                break;
+            case 'e':
+                format.mode = Quantity::Format::Mode::Scientific;
+                break;
+            case 's':
+                format.mode = Quantity::Format::Mode::Sexagesimal;
+                break;
+            case 'g':
+            default:
+                format.mode = Quantity::Format::Mode::General;
+                break;
+            }
+        }
+        else
+        {
             format.mode = Quantity::Format::Mode::Fixed;
         }
     }
 
     if (format.precision == Quantity::Format::PrecisionNull)
         format.precision = settings->resultPrecision;
-    if (format.notation == Quantity::Format::Notation::Null) {
+    if (format.notation == Quantity::Format::Notation::Null)
+    {
         if (settings->resultFormatComplex == 'c')
             format.notation = Quantity::Format::Notation::Cartesian;
         else if (settings->resultFormatComplex == 'p')
@@ -87,18 +95,22 @@ QString NumberFormatter::format(Quantity q)
     }
 
     bool time = false, arc = q.isDimensionless();
-    if (settings->resultFormat == 's' && q.hasDimension()) {
+    if (settings->resultFormat == 's' && q.hasDimension())
+    {
         auto dimension = q.getDimension();
-        if (dimension.count() == 1 && dimension.firstKey() == "time") {
+        if (dimension.count() == 1 && dimension.firstKey() == "time")
+        {
             auto iterator = dimension.begin();
-            if ( iterator->numerator() == 1 && iterator->denominator() == 1) {
+            if (iterator->numerator() == 1 && iterator->denominator() == 1)
+            {
                 q.clearDimension(); // remove unit, formatting itself is unit
                 time = true;
             }
         }
     }
 
-    if (arc && settings->resultFormat == 's') {     // convert to arcseconds
+    if (arc && settings->resultFormat == 's')
+    { // convert to arcseconds
         if (settings->angleUnit == 'r')
             q /= Quantity(HMath::pi() / HNumber(180));
         else if (settings->angleUnit == 'g')
@@ -107,14 +119,16 @@ QString NumberFormatter::format(Quantity q)
     }
 
     bool negative = false;
-    if (settings->resultFormat == 's' && q.isNegative()) {
+    if (settings->resultFormat == 's' && q.isNegative())
+    {
         q *= Quantity(HNumber(-1));
         negative = true;
     }
 
     QString result = DMath::format(q, format);
 
-    if (settings->resultFormat == 's' && (arc || time)) {   // sexagesimal
+    if (settings->resultFormat == 's' && (arc || time))
+    { // sexagesimal
         int dotPos = result.indexOf('.');
         HNumber seconds(dotPos > 0 ? result.left(dotPos).toStdString().c_str() : result.toStdString().c_str());
         HNumber mains = HMath::floor(seconds / HNumber(3600));
@@ -123,9 +137,9 @@ QString NumberFormatter::format(Quantity q)
         seconds -= (minutes * HNumber(60));
         HNumber::Format fixed = HNumber::Format::Fixed();
         QString sexa = HMath::format(mains, fixed);
-        sexa.append(time ? ':' : 0xB0).append(minutes < 10 ? "0" : "").append(HMath::format(minutes, fixed));
+        sexa.append(time ? u':' : u'\u00B0').append(minutes < 10 ? "0" : "").append(HMath::format(minutes, fixed));
         sexa.append(time ? ':' : '\'').append(seconds < 10 ? "0" : "").append(HMath::format(seconds, fixed));
-        if (dotPos > 0)     // append decimals
+        if (dotPos > 0) // append decimals
             sexa.append(result.mid(dotPos));
         result = sexa;
     }
@@ -140,8 +154,10 @@ QString NumberFormatter::format(Quantity q)
 
     // Replace all spaces between units with dot operator.
     int emptySpaces = 0;
-    for (auto& ch : result) {
-        if (ch.isSpace()) {
+    for (auto &ch : result)
+    {
+        if (ch.isSpace())
+        {
             ++emptySpaces;
             if (emptySpaces > 1)
                 ch = g_dotChar;
