@@ -20,10 +20,12 @@
 #ifndef UNITS_H
 #define UNITS_H
 
-#include <QHash>
-#include <QMap>
-
+#include "math/rational.h"
 #include "math/quantity.h"
+
+#include <QMap>
+#include <QHash>
+
 class Rational;
 
 struct Unit {

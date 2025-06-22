@@ -129,11 +129,11 @@ Manager::Manager(QObject *parent) : QObject(parent)
 #ifdef Q_OS_ANDROID
     QString datapath = QString("%1/%2").arg(QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation),
                                             "Android/data/org.syrja.speedcrunch/files");
-    QtAndroidPrivate::requestPermissions(QStringList("android.permission.WRITE_EXTERNAL_STORAGE")).then([](QtAndroidPrivate::PermissionResult result) { // TODO: Check this
+    QtAndroidPrivate::requestPermission("android.permission.WRITE_EXTERNAL_STORAGE").then([](QtAndroidPrivate::PermissionResult result) { // TODO: Check this
         {
             QString keyboardpath = QString("%1/%2").arg(QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation),
                                                         "Android/data/org.syrja.speedcrunch/files/keyboards");	//## lambda capture does not work?
-            if ( result["android.permission.WRITE_EXTERNAL_STORAGE"] == QtAndroidPrivate::PermissionResult::Authorized )
+            if ( result == QtAndroidPrivate::PermissionResult::Authorized )
                 QDir().mkpath(keyboardpath); }});
 #endif
 
